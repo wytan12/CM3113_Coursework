@@ -18,13 +18,6 @@ public class Relaxation {
             }
         }
 
-//        // test for bug
-//        for(int x = 0; x < width; x++){
-//            for(int y = 0; y < height; y++){
-//                padded.pixels[x][y] = img.pixels[x][y];
-//            }
-//        }
-
         // reflect top and bottom border
         for(int x = 0; x < width; x++){
             for(int p = 0; p < padding; p++){
@@ -74,14 +67,14 @@ public class Relaxation {
 
     public static double[] gaussianKernel(int sigma){
 
-        int radius = 3 * sigma;
-        int size = 2 * radius + 1;
+        int k = 3 * sigma;
+        int size = 2 * k + 1;
         double[] kernel = new double[size];
         double sum = 0;
 
-        for (int i = -radius; i <= radius; i++) {
-            kernel[i + radius] = Math.exp(-0.5 * (i * i) / (sigma * sigma));
-            sum += kernel[i + radius];
+        for (int i = -k; i <= k; i++) {
+            kernel[i + k] = Math.exp(-0.5 * (i * i) / (sigma * sigma));
+            sum += kernel[i + k];
         }
 
         // normalize kernel
@@ -93,20 +86,33 @@ public class Relaxation {
     }
 
     public static double[] firstDerivativeKernel(int sigma){
-        int radius = (int) Math.ceil(3 * sigma);
+        int radius = 3 * sigma;
         int size = 2 * radius + 1;
         double[] kernel = new double[size];
         double sum = 0;
 
         for (int i = -radius; i <= radius; i++) {
-            kernel[i + radius] = -i * Math.exp(-0.5 * (i * i) / (sigma * sigma));
+            kernel[i + radius] = (-i / (double) (sigma * sigma)) * Math.exp(-0.5 * (i * i) / (sigma * sigma));
             sum += Math.abs(kernel[i + radius]);
         }
 
         // Normalize kernel
-        for (int i = 0; i < size; i++) {
-            kernel[i] /= sum;
+//        for (int i = 0; i < size; i++) {
+//            kernel[i] /= sum;
+//        }
+        return kernel;
+    }
+
+    public static double[] secondDerivativeKernel(int sigma) {
+        int radius = 3 * sigma;
+        int size = 2 * radius + 1;
+        double[] kernel = new double[size];
+        double sum = 0;
+        for (int i = -radius; i <= radius; i++) {
+            kernel[i + radius] = (i * i - sigma * sigma) * Math.exp(-0.5 * (i * i) / (sigma * sigma));
+            sum += Math.abs(kernel[i + radius]);
         }
+
         return kernel;
     }
 
@@ -114,19 +120,22 @@ public class Relaxation {
     public static Image convolution(Image img, double[]kernelX, double[]kernelY){
         int width = img.width;
         int height = img.height;
+        int kernelRadius = kernelX.length / 2;
         Image result = new Image(img.depth, width, height);
 
-        int [][]temp = new int[width][height];
+        double[][] temp = new double[width][height];
 
         // horizontal
-        for(int x = 0; x < width; x++){
-            for(int y = 0; y < height; y++){
+        for(int y = 0; y < height; y++){
+            for(int x = 0; x < width; x++){
                 double sum = 0;
                 for (int i = -kernelX.length / 2; i <= kernelX.length / 2; i++) {
-                    int xi = Math.min(Math.max(x + i, 0), width - 1); // Clamping at borders
-                    sum += img.pixels[xi][y] * kernelX[i + kernelX.length / 2];
+                    int c = x + i;
+                    if (c >=0 && c < width) {
+                        sum += img.pixels[c][y] * kernelX[i + kernelX.length / 2];
+                    }
                 }
-                temp[x][y] = (int) sum;
+                temp[x][y] = sum;
             }
         }
 
@@ -135,14 +144,14 @@ public class Relaxation {
             for (int x = 0; x < width; x++) {
                 double sum = 0;
                 for (int i = -kernelY.length / 2; i <= kernelY.length / 2; i++) {
-                    int yi = Math.min(Math.max(y + i, 0), height - 1); // Clamping at borders
-                    sum += temp[x][yi] * kernelY[i + kernelY.length / 2];
+                    int r = y + i;
+                    if (r >= 0 && r < height) {
+                        sum += temp[x][r] * kernelY[i + kernelY.length / 2];
+                    }
                 }
-                result.pixels[x][y] = (int) Math.max(0, Math.min(255, sum)); // Clamping to 0-255 range
+                result.pixels[x][y] = (int) sum;
             }
         }
-
-
         return result;
     }
 

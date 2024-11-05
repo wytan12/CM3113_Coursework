@@ -15,18 +15,31 @@ public class SeparableSteerable {
         Image padded = Relaxation.applyPadding(input, sigma);
         padded.WritePGM("padded.pgm");
 
-        Image cropped = Relaxation.cropImage(padded, input.width, input.height, sigma);
+        Image gaussian = applyGaussianBlur(padded, sigma);
+        Image gaussianCropped = Relaxation.cropImage(gaussian, input.width, input.height, sigma);
+        gaussianCropped.WritePGM("G.pgm");
 
-        Image gaussian = applyGaussianBlur(cropped, sigma);
-        gaussian.WritePGM("G.pgm");
+        Image Gx = applyDerivativeX(padded, sigma);
+        Image GxCropped = Relaxation.cropImage(Gx, input.width, input.height, sigma);
+        scaleImage(GxCropped, displayMode);
+        GxCropped.WritePGM("Gx.pgm");
 
-        Image Gx = applyDerivativeX(cropped, sigma);
-        scaleImage(Gx, displayMode);
-        Gx.WritePGM("Gx_2.pgm");
+        Image Gy = applyDerivativeY(padded, sigma);
+        Image GyCropped = Relaxation.cropImage(Gy, input.width, input.height, sigma);
+        scaleImage(GyCropped, displayMode);
+        GyCropped.WritePGM("Gy.pgm");
 
-        Image Gy = applyDerivativeY(cropped, sigma);
-        scaleImage(Gy, displayMode);
-        Gy.WritePGM("Gy_2.pgm");
+        Image Gxx = applySecondDerivativeX(padded, sigma);
+        Image GxxCropped = Relaxation.cropImage(Gxx, input.width, input.height, sigma);
+        scaleImage(GxxCropped, displayMode);
+        GxxCropped.WritePGM("Gxx.pgm");
+
+
+        Image Gyy = applySecondDerivativeY(padded, sigma);
+        Image GyyCropped = Relaxation.cropImage(Gyy, input.width, input.height, sigma);
+        scaleImage(GyyCropped, displayMode);
+        GyyCropped.WritePGM("Gyy.pgm");
+
 
     }
 
@@ -48,68 +61,93 @@ public class SeparableSteerable {
         return Relaxation.convolution(img, gaussianKernel, derivativeKernelY);
     }
 
+    public static Image applySecondDerivativeX(Image img, int sigma) {
+        double[] gaussianKernel = Relaxation.gaussianKernel(sigma);
+        double[] secondDerivativeKernel = Relaxation.secondDerivativeKernel(sigma); // Implement similarly to first derivative
+        return Relaxation.convolution(img, secondDerivativeKernel, gaussianKernel);
+    }
+
+    public static Image applySecondDerivativeY(Image img, int sigma) {
+        double[] gaussianKernel = Relaxation.gaussianKernel(sigma);
+        double[] secondDerivativeKernel = Relaxation.secondDerivativeKernel(sigma);
+        return Relaxation.convolution(img, gaussianKernel, secondDerivativeKernel);
+    }
+
+
+
     // scale image (display mode)
     public static void scaleImage(Image img, int displayMode) {
         int width = img.width;
         int height = img.height;
+        double min, max;
+
 
         // Find the min and max values
-        double min = Double.MAX_VALUE;
-        double max = Double.MIN_VALUE;
+        min = max = 0;
 
         switch (displayMode) {
             case 1:
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
-                        double value = img.pixels[x][y];
-                        if (value < min) min = value;
-                        if (value > max) max = value;
+                        min = Math.min(min, img.pixels[x][y]);
+                        max = Math.max(max, img.pixels[x][y]);
+//                        double value = img.pixels[x][y];
+//                        if (value < min) min = value;
+//                        if (value > max) max = value;
                     }
                 }
 
-                // Scale values: map min to 0, max to 255, and zero to 128
+                // Step 2: Calculate range for scaling and set zero response to mid-gray (128)
+                double midGray = 128.0;
+                double range = Math.max(max, -min); // Use the larger of max or -min to handle positive/negative scaling
+
+
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
-                        int scaledValue = (int) ((img.pixels[x][y] - min) / (max - min) * 255);
-                        img.pixels[x][y] = scaledValue;
+                        int scaledValue = (int) ((img.pixels[x][y] / range) * 127 + midGray);
+                        img.pixels[x][y] = Math.max(0, Math.min(255, scaledValue)); // Clamp to 0–255 range
                     }
                 }
                 break;
             case 2:
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
-                        double value = img.pixels[x][y];
-                        if (value > 0 && value > max) max = value;
+                        if (img.pixels[x][y] < 0) {
+                            img.pixels[x][y] = 0;
+                        }
                     }
                 }
 
-                // Scale positive values to [0, 255], set negative values to 0
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
-                        if (img.pixels[x][y] > 0) {
-                            img.pixels[x][y] = (int) (img.pixels[x][y] / max * 255);
-                        } else {
-                            img.pixels[x][y] = 0;
-                        }
+                        max = Math.max(max, img.pixels[x][y]);
+                    }
+                }
+
+                // Step 3: Rescale intensities so that max value maps to 255
+                for (int x = 0; x < width; x++) {
+                    for (int y = 0; y < height; y++) {
+                        int scaledValue = (int) ((img.pixels[x][y] / max) * 255);
+                        img.pixels[x][y] = scaledValue;
                     }
                 }
                 break;
             case 3:
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
-                        double value = img.pixels[x][y];
-                        if (value < 0 && value < min) min = value;
+                        if (img.pixels[x][y] > 0) {
+                            img.pixels[x][y] = 0; // Set positive values to zero
+                        } else {
+                            min = Math.min(min, img.pixels[x][y]); // Find the maximum negative intensity (closest to zero)
+                        }
                     }
                 }
 
                 // Scale negative values to [0, 255], set positive values to 0
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
-                        if (img.pixels[x][y] < 0) {
-                            img.pixels[x][y] = (int) (img.pixels[x][y] / min * -255); // Convert to positive range
-                        } else {
-                            img.pixels[x][y] = 0;
-                        }
+                        int scaledValue = (int) ((img.pixels[x][y] / min) * 255);
+                        img.pixels[x][y] = scaledValue; // Clamp to 0–255 range
                     }
                 }
                 break;
