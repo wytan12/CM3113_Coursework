@@ -4,18 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="dcdec83a-8333-4b79-b2a7-94d9b068f291" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/G.pgm" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Gx.pgm" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Gx_2.pgm" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Gy.pgm" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Gy_2.pgm" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Relaxation.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/Relaxation.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Relaxation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Relaxation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/SeparableSteerable.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/SeparableSteerable.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/SeparableSteerable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/SeparableSteerable.java" afterDir="false" />
-    </list>
+    <list default="true" id="dcdec83a-8333-4b79-b2a7-94d9b068f291" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -83,7 +72,7 @@
       <workItem from="1730743385274" duration="8814000" />
       <workItem from="1730758603517" duration="6033000" />
       <workItem from="1730796257998" duration="1118000" />
-      <workItem from="1730800903291" duration="15600000" />
+      <workItem from="1730800903291" duration="15720000" />
     </task>
     <servers />
   </component>
