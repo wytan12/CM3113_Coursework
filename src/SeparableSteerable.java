@@ -89,7 +89,7 @@ public class SeparableSteerable {
 
     public static Image applySecondDerivativeX(Image img, int sigma) {
         double[] gaussianKernel = Relaxation.gaussianKernel(sigma);
-        double[] secondDerivativeKernel = Relaxation.secondDerivativeKernel(sigma); // Implement similarly to first derivative
+        double[] secondDerivativeKernel = Relaxation.secondDerivativeKernel(sigma); 
         return Relaxation.convolution(img, secondDerivativeKernel, gaussianKernel);
     }
 
@@ -101,7 +101,7 @@ public class SeparableSteerable {
 
     public static Image applyMixedDerivativeXY(Image img, int sigma) {
         double[] derivativeKernel = Relaxation.firstDerivativeKernel(sigma);
-        return Relaxation.convolution(img, derivativeKernel, derivativeKernel); // Mixed by using derivative in both directions
+        return Relaxation.convolution(img, derivativeKernel, derivativeKernel); 
     }
 
     public static Image computeEdges(Image Gx, Image Gy) {
@@ -121,8 +121,6 @@ public class SeparableSteerable {
         int height = img.height;
         double min, max;
 
-
-        // Find the min and max values
         min = max = 0;
 
         switch (displayMode) {
@@ -137,7 +135,6 @@ public class SeparableSteerable {
                     }
                 }
 
-                // Step 2: Calculate range for scaling and set zero response to mid-gray (128)
                 double midGray = 128.0;
                 double range = Math.max(max, -min); // Use the larger of max or -min to handle positive/negative scaling
 
