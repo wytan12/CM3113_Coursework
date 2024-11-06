@@ -6,7 +6,7 @@ public class SeparableSteerable {
         String filename = args[0];
         int sigma = Integer.parseInt(args[1]);
         int displayMode = Integer.parseInt(args[2]);
-//        int featureMode = Integer.parseInt(args[3]);
+        int featureMode = Integer.parseInt(args[3]);
 
         Image input = new Image();
         input.ReadPGM(filename);
@@ -34,11 +34,37 @@ public class SeparableSteerable {
         scaleImage(GxxCropped, displayMode);
         GxxCropped.WritePGM("Gxx.pgm");
 
-
         Image Gyy = applySecondDerivativeY(padded, sigma);
         Image GyyCropped = Relaxation.cropImage(Gyy, input.width, input.height, sigma);
         scaleImage(GyyCropped, displayMode);
         GyyCropped.WritePGM("Gyy.pgm");
+
+        Image Gxy = applyMixedDerivativeXY(padded, sigma);
+        Image GxyCropped = Relaxation.cropImage(Gxy, input.width, input.height, sigma);
+        scaleImage(GxyCropped, displayMode);
+        GxyCropped.WritePGM("Gxy.pgm");
+
+        switch (featureMode) {
+            case 1:
+                Image edges = computeEdges(Gx, Gy);
+                Image edgesCropped = Relaxation.cropImage(edges, input.width, input.height, sigma);
+                edgesCropped.WritePGM("edges.pgm");
+                break;
+            case 2: //TODO
+                
+                break;
+            case 3: //TODO
+                
+                break;
+            case 4: //TODO
+                
+                break;
+            case 5: //TODO
+                
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid feature mode.");
+        }
 
 
     }
@@ -73,7 +99,21 @@ public class SeparableSteerable {
         return Relaxation.convolution(img, gaussianKernel, secondDerivativeKernel);
     }
 
+    public static Image applyMixedDerivativeXY(Image img, int sigma) {
+        double[] derivativeKernel = Relaxation.firstDerivativeKernel(sigma);
+        return Relaxation.convolution(img, derivativeKernel, derivativeKernel); // Mixed by using derivative in both directions
+    }
 
+    public static Image computeEdges(Image Gx, Image Gy) {
+        Image edges = new Image(Gx.depth, Gx.width, Gx.height);
+        for (int y = 0; y < Gx.height; y++) {
+            for (int x = 0; x < Gx.width; x++) {
+                int magnitude = (int) Math.sqrt(Gx.pixels[x][y] * Gx.pixels[x][y] + Gy.pixels[x][y] * Gy.pixels[x][y]);
+                edges.pixels[x][y] = Math.min(255, magnitude);
+            }
+        }
+        return edges;
+    }
 
     // scale image (display mode)
     public static void scaleImage(Image img, int displayMode) {
