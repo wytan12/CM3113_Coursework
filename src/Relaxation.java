@@ -96,10 +96,6 @@ public class Relaxation {
             sum += Math.abs(kernel[i + radius]);
         }
 
-        // Normalize kernel
-//        for (int i = 0; i < size; i++) {
-//            kernel[i] /= sum;
-//        }
         return kernel;
     }
 

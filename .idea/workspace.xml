@@ -7,6 +7,7 @@
     <list default="true" id="dcdec83a-8333-4b79-b2a7-94d9b068f291" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Relaxation.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/Relaxation.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Relaxation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Relaxation.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/SeparableSteerable.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/SeparableSteerable.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/SeparableSteerable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/SeparableSteerable.java" afterDir="false" />
     </list>
@@ -41,7 +42,7 @@
     &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/tanwe/OneDrive/Desktop/Cardiff/Computer Vision/Coursework&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/tanwe/OneDrive/Desktop/Cardiff/Computer Vision/CM3113_Coursework&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -85,6 +86,8 @@
       <workItem from="1730842130449" duration="465000" />
       <workItem from="1730892295592" duration="792000" />
       <workItem from="1730929793769" duration="3081000" />
+      <workItem from="1730960285865" duration="7106000" />
+      <workItem from="1730990464907" duration="5932000" />
     </task>
     <servers />
   </component>

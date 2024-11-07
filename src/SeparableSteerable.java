@@ -11,56 +11,76 @@ public class SeparableSteerable {
         Image input = new Image();
         input.ReadPGM(filename);
 
+        int width = input.width;
+        int height = input.height;
+
         // padding 3 sigma
         Image padded = Relaxation.applyPadding(input, sigma);
         padded.WritePGM("padded.pgm");
 
         Image gaussian = applyGaussianBlur(padded, sigma);
-        Image gaussianCropped = Relaxation.cropImage(gaussian, input.width, input.height, sigma);
+        Image gaussianCropped = Relaxation.cropImage(gaussian, width, height, sigma);
         gaussianCropped.WritePGM("G.pgm");
 
         Image Gx = applyDerivativeX(padded, sigma);
-        Image GxCropped = Relaxation.cropImage(Gx, input.width, input.height, sigma);
+        Image GxCropped = Relaxation.cropImage(Gx, width, height, sigma);
         scaleImage(GxCropped, displayMode);
         GxCropped.WritePGM("Gx.pgm");
 
         Image Gy = applyDerivativeY(padded, sigma);
-        Image GyCropped = Relaxation.cropImage(Gy, input.width, input.height, sigma);
+        Image GyCropped = Relaxation.cropImage(Gy, width, height, sigma);
         scaleImage(GyCropped, displayMode);
         GyCropped.WritePGM("Gy.pgm");
 
         Image Gxx = applySecondDerivativeX(padded, sigma);
-        Image GxxCropped = Relaxation.cropImage(Gxx, input.width, input.height, sigma);
+        Image GxxCropped = Relaxation.cropImage(Gxx, width, height, sigma);
         scaleImage(GxxCropped, displayMode);
         GxxCropped.WritePGM("Gxx.pgm");
 
         Image Gyy = applySecondDerivativeY(padded, sigma);
-        Image GyyCropped = Relaxation.cropImage(Gyy, input.width, input.height, sigma);
+        Image GyyCropped = Relaxation.cropImage(Gyy, width, height, sigma);
         scaleImage(GyyCropped, displayMode);
         GyyCropped.WritePGM("Gyy.pgm");
 
         Image Gxy = applyMixedDerivativeXY(padded, sigma);
-        Image GxyCropped = Relaxation.cropImage(Gxy, input.width, input.height, sigma);
+        Image GxyCropped = Relaxation.cropImage(Gxy, width, height, sigma);
         scaleImage(GxyCropped, displayMode);
         GxyCropped.WritePGM("Gxy.pgm");
 
+        // print by selecting feature mode or all at once ??
         switch (featureMode) {
             case 1:
-                Image edges = computeEdges(Gx, Gy);
-                Image edgesCropped = Relaxation.cropImage(edges, input.width, input.height, sigma);
+                Image edges = Feature.computeEdges(Gx, Gy);
+                Image edgesCropped = Relaxation.cropImage(edges, width, height, sigma);
                 edgesCropped.WritePGM("edges.pgm");
                 break;
             case 2: //TODO
-                
+                Image radialEdges = Feature.computeRadialEdges(Gx, Gy, input);
+                radialEdges.WritePGM("radialEdges.pgm");
+                Image radialEdgesCropped = Relaxation.cropImage(radialEdges, width, height, sigma);
+                scaleImage(radialEdgesCropped, displayMode);
+                radialEdgesCropped.WritePGM("edgesRadial.pgm");
                 break;
-            case 3: //TODO
-                
+            case 3: //centre not connected
+                Image ridges = Feature.computeRidgesEigen(Gxx, Gxy, Gyy);
+                scaleImage(ridges, displayMode);
+                Image ridgesCropped = Relaxation.cropImage(ridges, width, height, sigma);
+                ridgesCropped.WritePGM("ridgesEigen.pgm");
                 break;
-            case 4: //TODO
-                
+            case 4: //centre not obvious
+                Image radialRidges = Feature.computeRadialRidges(Gxx, Gxy, Gyy, input);
+                //scaleImage(radialRidges, displayMode);
+                Image radialRidgesCropped = Relaxation.cropImage(radialRidges, width, height, sigma);
+                scaleImage(radialRidgesCropped, displayMode);
+                radialRidgesCropped.WritePGM("ridgesRadial.pgm");
                 break;
-            case 5: //TODO
-                
+            case 5:
+                Image corners = Feature.computeCorners(Gxx, Gxy, Gyy);
+                scaleImage(corners, displayMode);
+                Image cornersCropped = Relaxation.cropImage(corners, width, height, sigma);
+                cornersCropped.WritePGM("corners.pgm");
+                // TODO:create corner overlay image
+
                 break;
             default:
                 throw new IllegalArgumentException("Invalid feature mode.");
@@ -104,16 +124,6 @@ public class SeparableSteerable {
         return Relaxation.convolution(img, derivativeKernel, derivativeKernel); 
     }
 
-    public static Image computeEdges(Image Gx, Image Gy) {
-        Image edges = new Image(Gx.depth, Gx.width, Gx.height);
-        for (int y = 0; y < Gx.height; y++) {
-            for (int x = 0; x < Gx.width; x++) {
-                int magnitude = (int) Math.sqrt(Gx.pixels[x][y] * Gx.pixels[x][y] + Gy.pixels[x][y] * Gy.pixels[x][y]);
-                edges.pixels[x][y] = Math.min(255, magnitude);
-            }
-        }
-        return edges;
-    }
 
     // scale image (display mode)
     public static void scaleImage(Image img, int displayMode) {
