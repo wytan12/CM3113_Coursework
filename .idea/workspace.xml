@@ -6,6 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="dcdec83a-8333-4b79-b2a7-94d9b068f291" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Feature.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/Feature.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Feature.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Feature.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Relaxation.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/Relaxation.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Relaxation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Relaxation.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/SeparableSteerable.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/SeparableSteerable.class" afterDir="false" />
@@ -88,6 +90,13 @@
       <workItem from="1730929793769" duration="3081000" />
       <workItem from="1730960285865" duration="7106000" />
       <workItem from="1730990464907" duration="5932000" />
+      <workItem from="1731055316448" duration="14606000" />
+      <workItem from="1731109292773" duration="3575000" />
+      <workItem from="1731601853344" duration="1057000" />
+      <workItem from="1731704842997" duration="796000" />
+      <workItem from="1731744311398" duration="12188000" />
+      <workItem from="1731935146451" duration="14389000" />
+      <workItem from="1732010700357" duration="6798000" />
     </task>
     <servers />
   </component>

@@ -116,7 +116,6 @@ public class Relaxation {
     public static Image convolution(Image img, double[]kernelX, double[]kernelY){
         int width = img.width;
         int height = img.height;
-        int kernelRadius = kernelX.length / 2;
         Image result = new Image(img.depth, width, height);
 
         double[][] temp = new double[width][height];
@@ -126,7 +125,9 @@ public class Relaxation {
             for(int x = 0; x < width; x++){
                 double sum = 0;
                 for (int i = -kernelX.length / 2; i <= kernelX.length / 2; i++) {
+                    // access the neighboring pixels
                     int c = x + i;
+                    // prevent out of bound error
                     if (c >=0 && c < width) {
                         sum += img.pixels[c][y] * kernelX[i + kernelX.length / 2];
                     }

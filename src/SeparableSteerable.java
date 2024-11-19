@@ -23,6 +23,7 @@ public class SeparableSteerable {
         gaussianCropped.WritePGM("G.pgm");
 
         Image Gx = applyDerivativeX(padded, sigma);
+        scaleImage(Gx, displayMode);
         Image GxCropped = Relaxation.cropImage(Gx, width, height, sigma);
         scaleImage(GxCropped, displayMode);
         GxCropped.WritePGM("Gx.pgm");
@@ -49,37 +50,41 @@ public class SeparableSteerable {
 
         // print by selecting feature mode or all at once ??
         switch (featureMode) {
-            case 1:
+            case 1: // TODO: add non maximum suppression + thresholding (if possible)
                 Image edges = Feature.computeEdges(Gx, Gy);
                 Image edgesCropped = Relaxation.cropImage(edges, width, height, sigma);
+                scaleImage(edgesCropped, 2);
                 edgesCropped.WritePGM("edges.pgm");
                 break;
-            case 2: //TODO
-                Image radialEdges = Feature.computeRadialEdges(Gx, Gy, input);
-                radialEdges.WritePGM("radialEdges.pgm");
+            case 2:
+                Image radialEdges = Feature.computeRadialEdges(Gx, Gy, padded);
                 Image radialEdgesCropped = Relaxation.cropImage(radialEdges, width, height, sigma);
                 scaleImage(radialEdgesCropped, displayMode);
                 radialEdgesCropped.WritePGM("edgesRadial.pgm");
                 break;
-            case 3: //centre not connected
+            case 3:
                 Image ridges = Feature.computeRidgesEigen(Gxx, Gxy, Gyy);
                 scaleImage(ridges, displayMode);
                 Image ridgesCropped = Relaxation.cropImage(ridges, width, height, sigma);
                 ridgesCropped.WritePGM("ridgesEigen.pgm");
                 break;
-            case 4: //centre not obvious
-                Image radialRidges = Feature.computeRadialRidges(Gxx, Gxy, Gyy, input);
-                //scaleImage(radialRidges, displayMode);
+            case 4:
+                Image radialRidges = Feature.computeRadialRidges(Gxx, Gxy, Gyy, padded);
+                scaleImage(radialRidges, displayMode);
                 Image radialRidgesCropped = Relaxation.cropImage(radialRidges, width, height, sigma);
-                scaleImage(radialRidgesCropped, displayMode);
                 radialRidgesCropped.WritePGM("ridgesRadial.pgm");
                 break;
             case 5:
                 Image corners = Feature.computeCorners(Gxx, Gxy, Gyy);
-                scaleImage(corners, displayMode);
+                //scaleImage(corners, 3);
                 Image cornersCropped = Relaxation.cropImage(corners, width, height, sigma);
+                scaleImage(cornersCropped, 3);
                 cornersCropped.WritePGM("corners.pgm");
-                // TODO:create corner overlay image
+
+                // create corner overlay image
+                double thresholdFactor = 3.0; // Threshold factor (3 * stdDev)
+                ImagePPM overlayImage = Feature.overlayCorners(input, cornersCropped, thresholdFactor);
+                overlayImage.WritePPM("cornersOverlay.ppm");
 
                 break;
             default:
@@ -124,6 +129,12 @@ public class SeparableSteerable {
         return Relaxation.convolution(img, derivativeKernel, derivativeKernel); 
     }
 
+    // TODO: add one more feature
+    // check the output image
+    public static Image applySuppressedEdges(Image Gx, Image Gy, int sigma) {
+        Image edges = Feature.computeEdges(Gx, Gy);
+        return Feature.nonMaxSuppression(Gx, Gy, edges);
+    }
 
     // scale image (display mode)
     public static void scaleImage(Image img, int displayMode) {
@@ -135,24 +146,31 @@ public class SeparableSteerable {
 
         switch (displayMode) {
             case 1:
+
+                // find the min and max
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
                         min = Math.min(min, img.pixels[x][y]);
                         max = Math.max(max, img.pixels[x][y]);
-//                        double value = img.pixels[x][y];
-//                        if (value < min) min = value;
-//                        if (value > max) max = value;
                     }
                 }
 
                 double midGray = 128.0;
-                double range = Math.max(max, -min); // Use the larger of max or -min to handle positive/negative scaling
+                double scale;
 
+                // either the maximum positive intensity is 255 or the minimum negative intensity is 0
+                if (Math.abs(max) > Math.abs(min)) {
+                    scale = 127.0 / max;
+                } else {
+                    scale = 128.0 / Math.abs(min);
+                }
 
+                // scale to fit [0,255]
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
-                        int scaledValue = (int) ((img.pixels[x][y] / range) * 127 + midGray);
-                        img.pixels[x][y] = Math.max(0, Math.min(255, scaledValue)); // Clamp to 0–255 range
+                        // zero response will set to 128
+                        int scaledValue = (int)(img.pixels[x][y] * scale + midGray);
+                        img.pixels[x][y] = Math.max(0, Math.min(255, scaledValue));
                     }
                 }
                 break;
@@ -171,7 +189,7 @@ public class SeparableSteerable {
                     }
                 }
 
-                // Step 3: Rescale intensities so that max value maps to 255
+                // rescale intensities so that max value maps to 255
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
                         int scaledValue = (int) ((img.pixels[x][y] / max) * 255);
@@ -185,7 +203,8 @@ public class SeparableSteerable {
                         if (img.pixels[x][y] > 0) {
                             img.pixels[x][y] = 0; // Set positive values to zero
                         } else {
-                            min = Math.min(min, img.pixels[x][y]); // Find the maximum negative intensity (closest to zero)
+                            // Find the maximum negative intensity (closest to zero)
+                            min = Math.min(min, img.pixels[x][y]);
                         }
                     }
                 }
