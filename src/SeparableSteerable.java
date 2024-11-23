@@ -23,7 +23,6 @@ public class SeparableSteerable {
         gaussianCropped.WritePGM("G.pgm");
 
         Image Gx = applyDerivativeX(padded, sigma);
-        scaleImage(Gx, displayMode);
         Image GxCropped = Relaxation.cropImage(Gx, width, height, sigma);
         scaleImage(GxCropped, displayMode);
         GxCropped.WritePGM("Gx.pgm");
@@ -48,13 +47,18 @@ public class SeparableSteerable {
         scaleImage(GxyCropped, displayMode);
         GxyCropped.WritePGM("Gxy.pgm");
 
-        // print by selecting feature mode or all at once ??
+        // generate output by selecting feature mode
         switch (featureMode) {
-            case 1: // TODO: add non maximum suppression + thresholding (if possible)
+            case 1:
                 Image edges = Feature.computeEdges(Gx, Gy);
                 Image edgesCropped = Relaxation.cropImage(edges, width, height, sigma);
                 scaleImage(edgesCropped, 2);
-                edgesCropped.WritePGM("edges.pgm");
+                edgesCropped.WritePGM("output/sailboat/edges.pgm");
+
+                Image edgesNMS = Feature.nonMaxSuppression(Gx, Gy, edges);
+                Image edgesNMSCropped = Relaxation.cropImage(edgesNMS, width, height, sigma);
+                scaleImage(edgesNMSCropped, 2);
+                edgesNMSCropped.WritePGM("output/sailboat/edgesNMS.pgm");
                 break;
             case 2:
                 Image radialEdges = Feature.computeRadialEdges(Gx, Gy, padded);
@@ -76,14 +80,15 @@ public class SeparableSteerable {
                 break;
             case 5:
                 Image corners = Feature.computeCorners(Gxx, Gxy, Gyy);
-                //scaleImage(corners, 3);
                 Image cornersCropped = Relaxation.cropImage(corners, width, height, sigma);
-                scaleImage(cornersCropped, 3);
+                scaleImage(cornersCropped, displayMode);
                 cornersCropped.WritePGM("corners.pgm");
 
                 // create corner overlay image
+                Image cornerOverlay = Relaxation.cropImage(corners, width, height, sigma);
+                scaleImage(cornerOverlay, 3);
                 double thresholdFactor = 3.0; // Threshold factor (3 * stdDev)
-                ImagePPM overlayImage = Feature.overlayCorners(input, cornersCropped, thresholdFactor);
+                ImagePPM overlayImage = Feature.overlayCorners(input, cornerOverlay, thresholdFactor);
                 overlayImage.WritePPM("cornersOverlay.ppm");
 
                 break;
@@ -129,13 +134,6 @@ public class SeparableSteerable {
         return Relaxation.convolution(img, derivativeKernel, derivativeKernel); 
     }
 
-    // TODO: add one more feature
-    // check the output image
-    public static Image applySuppressedEdges(Image Gx, Image Gy, int sigma) {
-        Image edges = Feature.computeEdges(Gx, Gy);
-        return Feature.nonMaxSuppression(Gx, Gy, edges);
-    }
-
     // scale image (display mode)
     public static void scaleImage(Image img, int displayMode) {
         int width = img.width;
@@ -146,7 +144,6 @@ public class SeparableSteerable {
 
         switch (displayMode) {
             case 1:
-
                 // find the min and max
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
@@ -160,7 +157,7 @@ public class SeparableSteerable {
 
                 // either the maximum positive intensity is 255 or the minimum negative intensity is 0
                 if (Math.abs(max) > Math.abs(min)) {
-                    scale = 127.0 / max;
+                    scale = 128.0 / max;
                 } else {
                     scale = 128.0 / Math.abs(min);
                 }
@@ -221,6 +218,5 @@ public class SeparableSteerable {
                 throw new IllegalArgumentException("Invalid display mode");
         }
     }
-
 
 }

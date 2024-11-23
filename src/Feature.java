@@ -6,40 +6,12 @@ public class Feature {
             for (int x = 0; x < Gx.width; x++) {
                 int gx = Gx.pixels[x][y];
                 int gy = Gy.pixels[x][y];
-                //int magnitude = (int) Math.sqrt(Gx.pixels[x][y] * Gx.pixels[x][y] + Gy.pixels[x][y] * Gy.pixels[x][y]);
-                //edges.pixels[x][y] = Math.min(255, magnitude);
-                 // Calculate gradient direction in radians
                 edges.pixels[x][y] = (int) Math.sqrt(gx * gx + gy * gy);
             }
         }
 
         return edges;
     }
-//    public static Image computeEdges(Image Gx, Image Gy) {
-//        Image edges = new Image(Gx.depth, Gx.width, Gx.height);
-//        double maxMagnitude = 0;
-//
-//        // First pass - find maximum magnitude
-//        for (int y = 0; y < Gx.height; y++) {
-//            for (int x = 0; x < Gx.width; x++) {
-//                double gx = Gx.pixels[x][y];
-//                double gy = Gy.pixels[x][y];
-//                double magnitude = Math.sqrt(gx * gx + gy * gy);
-//                maxMagnitude = Math.max(maxMagnitude, magnitude);
-//            }
-//        }
-//
-//        // Second pass - scale and set pixels
-//        for (int y = 0; y < Gx.height; y++) {
-//            for (int x = 0; x < Gx.width; x++) {
-//                double gx = Gx.pixels[x][y];
-//                double gy = Gy.pixels[x][y];
-//                double magnitude = Math.sqrt(gx * gx + gy * gy);
-//                edges.pixels[x][y] = (int)(255 * magnitude / maxMagnitude);
-//            }
-//        }
-//        return edges;
-//    }
 
     // extra feature
     public static Image nonMaxSuppression(Image Gx, Image Gy, Image edges) {
@@ -190,9 +162,10 @@ public class Feature {
 
         for (int y = 0; y < Gxx.height; y++) {
             for (int x = 0; x < Gxx.width; x++) {
+                // Hessian matrix
                 double determinant = (Gxx.pixels[x][y] * Gyy.pixels[x][y]) - (Gxy.pixels[x][y] * Gxy.pixels[x][y]);
                 double trace = Gxx.pixels[x][y] + Gyy.pixels[x][y];
-                double H = determinant - 0.2 * trace * trace;
+                double H = determinant - 0.1 * trace * trace;
                 //corners.pixels[x][y] = (int) determinant;
                 corners.pixels[x][y] = (int) H;
             }
@@ -206,21 +179,24 @@ public class Feature {
         // calculate mean and standard deviation of the corner response
         int width = corners.width;
         int height = corners.height;
-        double sum = 0.0, sumSq = 0.0;
+
+        double sumSq = 0.0;
         int count = width * height;
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 double response = corners.pixels[x][y];
-                sum += response;
-                sumSq += response * response;
+                sumSq += response * response; // variance since mean = 0
             }
         }
 
-        double mean = sum / count;
-        double variance = (sumSq / count) - (mean * mean);
+        double variance = sumSq / count;
         double stdDev = Math.sqrt(variance);
+        // 0 + 3s (assume mean = 0)
         double threshold = thresholdFactor * stdDev;
+        // System.out.println("Mean: " + mean);
+        // System.out.println("Standard Deviation: " + stdDev);
+        // System.out.println("Threshold: " + threshold);
 
         ImagePPM overlay = new ImagePPM(255, input.width, input.height);
 
@@ -243,38 +219,4 @@ public class Feature {
 
         return overlay;
     }
-
-
-    public static Image nonMaxSuppression(Image corners) {
-        int width = corners.width;
-        int height = corners.height;
-
-        Image suppressed = new Image(corners.depth, width, height);
-
-        for (int y = 1; y < height - 1; y++) {
-            for (int x = 1; x < width - 1; x++) {
-                int response = corners.pixels[x][y];
-
-                // Check if the current pixel is the local maximum
-                boolean isMax = true;
-                for (int dy = -1; dy <= 1; dy++) {
-                    for (int dx = -1; dx <= 1; dx++) {
-                        if (dx != 0 || dy != 0) { // Exclude the center pixel
-                            if (corners.pixels[x + dx][y + dy] > response) {
-                                isMax = false;
-                                break;
-                            }
-                        }
-                    }
-                    if (!isMax) break;
-                }
-
-                suppressed.pixels[x][y] = isMax ? response : 0;
-            }
-        }
-
-        return suppressed;
-    }
-
-
 }
