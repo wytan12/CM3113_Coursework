@@ -52,13 +52,11 @@ public class SeparableSteerable {
             case 1:
                 Image edges = Feature.computeEdges(Gx, Gy);
                 Image edgesCropped = Relaxation.cropImage(edges, width, height, sigma);
-                scaleImage(edgesCropped, 2);
-                edgesCropped.WritePGM("output/sailboat/edges.pgm");
+                edgesCropped.WritePGM("edges.pgm");
 
                 Image edgesNMS = Feature.nonMaxSuppression(Gx, Gy, edges);
                 Image edgesNMSCropped = Relaxation.cropImage(edgesNMS, width, height, sigma);
-                scaleImage(edgesNMSCropped, 2);
-                edgesNMSCropped.WritePGM("output/sailboat/edgesNMS.pgm");
+                edgesNMSCropped.WritePGM("edgesNMS.pgm");
                 break;
             case 2:
                 Image radialEdges = Feature.computeRadialEdges(Gx, Gy, padded);

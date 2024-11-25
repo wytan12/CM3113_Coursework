@@ -2,11 +2,28 @@ public class Feature {
     public static Image computeEdges(Image Gx, Image Gy) {
         Image edges = new Image(Gx.depth, Gx.width, Gx.height);
 
+        int min = edges.pixels[0][0];
+        int max = edges.pixels[0][0];
+
         for (int y = 0; y < Gx.height; y++) {
             for (int x = 0; x < Gx.width; x++) {
                 int gx = Gx.pixels[x][y];
                 int gy = Gy.pixels[x][y];
-                edges.pixels[x][y] = (int) Math.sqrt(gx * gx + gy * gy);
+                int magnitude = (int) Math.sqrt(gx * gx + gy * gy);
+
+                edges.pixels[x][y] = magnitude;
+
+                if (magnitude < min) min = magnitude;
+                if (magnitude > max) max = magnitude;
+            }
+        }
+
+        // scale the pixel values to the range [0, 255]
+        double range = max - min;
+        for (int y = 0; y < Gx.height; y++) {
+            for (int x = 0; x < Gx.width; x++) {
+                int value = edges.pixels[x][y];
+                edges.pixels[x][y] = (int) ((value - min) / range * 255);
             }
         }
 
@@ -26,13 +43,16 @@ public class Feature {
                 double gy = Gy.pixels[x][y];
                 angles[x][y] = Math.atan2(gy, gx);
 
-                double angle = angles[x][y] * 180 / Math.PI; // Convert to degrees
-                angle = (angle < 0) ? angle + 180 : angle; // Ensure angle is positive
+                // convert to degrees
+                double angle = angles[x][y] * 180 / Math.PI; 
+                if(angle < 0){
+                    angle += 180;
+                }
 
                 int magnitude = edges.pixels[x][y];
                 int q = 255, r = 255;
 
-                // Determine which two neighbors to compare based on the gradient direction
+                // determine which two neighbors to compare based on the gradient direction
                 if ((angle >= 0 && angle < 22.5) || (angle >= 157.5 && angle <= 180)) {
                     // 0 degrees (horizontal)
                     q = edges.pixels[x + 1][y];
