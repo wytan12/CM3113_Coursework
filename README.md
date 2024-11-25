@@ -5,14 +5,14 @@ A Java implementation of separable and steerable Gaussian filters for detecting 
 
 ## **Features**
 - **Edge Detection**:
-  - Standard edges using the gradient magnitude (\( \sqrt{G_x^2 + G_y^2} \)).
+  - Standard edges using the gradient magnitude ( \sqrt{G_x^2 + G_y^2}).
   - Radial edges aligned from the image center using directional derivatives.
   - Non-Maximum Suppression (NMS) for edge refinement.
 - **Ridge Detection**:
   - Standard ridges based on the eigenvalues of the Hessian matrix.
   - Radial ridges aligned with radial directions from the image center.
 - **Corner Detection**:
-  - Keypoints detected using the determinant of the Hessian matrix (\( G_{xx}G_{yy} - G_{xy}^2 \)).
+  - Keypoints detected using the determinant of the Hessian matrix (Gxx Gyy - Gxy^2).
   - Enhanced with Harris Corner Detection.
   - Thresholding using standard deviation (\(0 + 3s\)) with overlay visualization.
 
@@ -52,8 +52,8 @@ The program generates the following output files in `.pgm` or `.ppm` format:
 - **Separable Filters**: Efficiently compute Gaussian smoothing and derivatives using 1D convolutions.
 - **Steerable Filters**: Compute directional responses by combining derivatives of Gaussian kernels for arbitrary angles.
 - **Feature Extraction**:
-  - **Edges**: Computed using the first derivatives (\( G_x \), \( G_y \)).
-  - **Ridges**: Computed using eigenvalues of the Hessian matrix (\( G_{xx} \), \( G_{yy} \), \( G_{xy} \)).
+  - **Edges**: Computed using the first derivatives (Gx, Gy).
+  - **Ridges**: Computed using eigenvalues of the Hessian matrix (Gxx, Gyy, Gxy).
   - **Corners**: Computed using the determinant of the Hessian matrix, refined with Harris Corner Detection.
 
 
