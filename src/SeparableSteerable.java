@@ -15,35 +15,35 @@ public class SeparableSteerable {
         int height = input.height;
 
         // padding 3 sigma
-        Image padded = Relaxation.applyPadding(input, sigma);
+        Image padded = Helper.applyPadding(input, sigma);
         padded.WritePGM("padded.pgm");
 
         Image gaussian = applyGaussianBlur(padded, sigma);
-        Image gaussianCropped = Relaxation.cropImage(gaussian, width, height, sigma);
+        Image gaussianCropped = Helper.cropImage(gaussian, width, height, sigma);
         gaussianCropped.WritePGM("G.pgm");
 
         Image Gx = applyDerivativeX(padded, sigma);
-        Image GxCropped = Relaxation.cropImage(Gx, width, height, sigma);
+        Image GxCropped = Helper.cropImage(Gx, width, height, sigma);
         scaleImage(GxCropped, displayMode);
         GxCropped.WritePGM("Gx.pgm");
 
         Image Gy = applyDerivativeY(padded, sigma);
-        Image GyCropped = Relaxation.cropImage(Gy, width, height, sigma);
+        Image GyCropped = Helper.cropImage(Gy, width, height, sigma);
         scaleImage(GyCropped, displayMode);
         GyCropped.WritePGM("Gy.pgm");
 
         Image Gxx = applySecondDerivativeX(padded, sigma);
-        Image GxxCropped = Relaxation.cropImage(Gxx, width, height, sigma);
+        Image GxxCropped = Helper.cropImage(Gxx, width, height, sigma);
         scaleImage(GxxCropped, displayMode);
         GxxCropped.WritePGM("Gxx.pgm");
 
         Image Gyy = applySecondDerivativeY(padded, sigma);
-        Image GyyCropped = Relaxation.cropImage(Gyy, width, height, sigma);
+        Image GyyCropped = Helper.cropImage(Gyy, width, height, sigma);
         scaleImage(GyyCropped, displayMode);
         GyyCropped.WritePGM("Gyy.pgm");
 
         Image Gxy = applyMixedDerivativeXY(padded, sigma);
-        Image GxyCropped = Relaxation.cropImage(Gxy, width, height, sigma);
+        Image GxyCropped = Helper.cropImage(Gxy, width, height, sigma);
         scaleImage(GxyCropped, displayMode);
         GxyCropped.WritePGM("Gxy.pgm");
 
@@ -51,39 +51,39 @@ public class SeparableSteerable {
         switch (featureMode) {
             case 1:
                 Image edges = Feature.computeEdges(Gx, Gy);
-                Image edgesCropped = Relaxation.cropImage(edges, width, height, sigma);
+                Image edgesCropped = Helper.cropImage(edges, width, height, sigma);
                 edgesCropped.WritePGM("edges.pgm");
 
                 Image edgesNMS = Feature.nonMaxSuppression(Gx, Gy, edges);
-                Image edgesNMSCropped = Relaxation.cropImage(edgesNMS, width, height, sigma);
+                Image edgesNMSCropped = Helper.cropImage(edgesNMS, width, height, sigma);
                 edgesNMSCropped.WritePGM("edgesNMS.pgm");
                 break;
             case 2:
                 Image radialEdges = Feature.computeRadialEdges(Gx, Gy, padded);
-                Image radialEdgesCropped = Relaxation.cropImage(radialEdges, width, height, sigma);
+                Image radialEdgesCropped = Helper.cropImage(radialEdges, width, height, sigma);
                 scaleImage(radialEdgesCropped, displayMode);
                 radialEdgesCropped.WritePGM("edgesRadial.pgm");
                 break;
             case 3:
                 Image ridges = Feature.computeRidgesEigen(Gxx, Gxy, Gyy);
                 scaleImage(ridges, displayMode);
-                Image ridgesCropped = Relaxation.cropImage(ridges, width, height, sigma);
+                Image ridgesCropped = Helper.cropImage(ridges, width, height, sigma);
                 ridgesCropped.WritePGM("ridgesEigen.pgm");
                 break;
             case 4:
                 Image radialRidges = Feature.computeRadialRidges(Gxx, Gxy, Gyy, padded);
                 scaleImage(radialRidges, displayMode);
-                Image radialRidgesCropped = Relaxation.cropImage(radialRidges, width, height, sigma);
+                Image radialRidgesCropped = Helper.cropImage(radialRidges, width, height, sigma);
                 radialRidgesCropped.WritePGM("ridgesRadial.pgm");
                 break;
             case 5:
                 Image corners = Feature.computeCorners(Gxx, Gxy, Gyy);
-                Image cornersCropped = Relaxation.cropImage(corners, width, height, sigma);
+                Image cornersCropped = Helper.cropImage(corners, width, height, sigma);
                 scaleImage(cornersCropped, displayMode);
                 cornersCropped.WritePGM("corners.pgm");
 
                 // create corner overlay image
-                Image cornerOverlay = Relaxation.cropImage(corners, width, height, sigma);
+                Image cornerOverlay = Helper.cropImage(corners, width, height, sigma);
                 scaleImage(cornerOverlay, 3);
                 double thresholdFactor = 3.0; // Threshold factor (3 * stdDev)
                 ImagePPM overlayImage = Feature.overlayCorners(input, cornerOverlay, thresholdFactor);
@@ -99,37 +99,37 @@ public class SeparableSteerable {
 
     //gaussian filter
     public static Image applyGaussianBlur(Image img, int sigma) {
-        double[] kernel = Relaxation.gaussianKernel(sigma);
-        return Relaxation.convolution(img, kernel, kernel);
+        double[] kernel = Gaussian.gaussianKernel(sigma);
+        return Helper.convolution(img, kernel, kernel);
     }
 
     public static Image applyDerivativeX(Image img, int sigma) {
-        double[] gaussianKernel = Relaxation.gaussianKernel(sigma);
-        double[] derivativeKernelX = Relaxation.firstDerivativeKernel(sigma);
-        return Relaxation.convolution(img, derivativeKernelX, gaussianKernel);
+        double[] gaussianKernel = Gaussian.gaussianKernel(sigma);
+        double[] derivativeKernelX = Gaussian.firstDerivativeKernel(sigma);
+        return Helper.convolution(img, derivativeKernelX, gaussianKernel);
     }
 
     public static Image applyDerivativeY(Image img, int sigma) {
-        double[] gaussianKernel = Relaxation.gaussianKernel(sigma);
-        double[] derivativeKernelY = Relaxation.firstDerivativeKernel(sigma);
-        return Relaxation.convolution(img, gaussianKernel, derivativeKernelY);
+        double[] gaussianKernel = Gaussian.gaussianKernel(sigma);
+        double[] derivativeKernelY = Gaussian.firstDerivativeKernel(sigma);
+        return Helper.convolution(img, gaussianKernel, derivativeKernelY);
     }
 
     public static Image applySecondDerivativeX(Image img, int sigma) {
-        double[] gaussianKernel = Relaxation.gaussianKernel(sigma);
-        double[] secondDerivativeKernel = Relaxation.secondDerivativeKernel(sigma); 
-        return Relaxation.convolution(img, secondDerivativeKernel, gaussianKernel);
+        double[] gaussianKernel = Gaussian.gaussianKernel(sigma);
+        double[] secondDerivativeKernel = Gaussian.secondDerivativeKernel(sigma);
+        return Helper.convolution(img, secondDerivativeKernel, gaussianKernel);
     }
 
     public static Image applySecondDerivativeY(Image img, int sigma) {
-        double[] gaussianKernel = Relaxation.gaussianKernel(sigma);
-        double[] secondDerivativeKernel = Relaxation.secondDerivativeKernel(sigma);
-        return Relaxation.convolution(img, gaussianKernel, secondDerivativeKernel);
+        double[] gaussianKernel = Gaussian.gaussianKernel(sigma);
+        double[] secondDerivativeKernel = Gaussian.secondDerivativeKernel(sigma);
+        return Helper.convolution(img, gaussianKernel, secondDerivativeKernel);
     }
 
     public static Image applyMixedDerivativeXY(Image img, int sigma) {
-        double[] derivativeKernel = Relaxation.firstDerivativeKernel(sigma);
-        return Relaxation.convolution(img, derivativeKernel, derivativeKernel); 
+        double[] derivativeKernel = Gaussian.firstDerivativeKernel(sigma);
+        return Helper.convolution(img, derivativeKernel, derivativeKernel);
     }
 
     // scale image (display mode)

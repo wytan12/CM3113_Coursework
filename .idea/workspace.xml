@@ -5,7 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="dcdec83a-8333-4b79-b2a7-94d9b068f291" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Relaxation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Helper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/SeparableSteerable.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/SeparableSteerable.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/SeparableSteerable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/SeparableSteerable.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,6 +48,9 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -95,6 +102,10 @@
       <workItem from="1732376277367" duration="8354000" />
       <workItem from="1732402117503" duration="351000" />
       <workItem from="1732545625239" duration="157000" />
+      <workItem from="1732650991419" duration="8000" />
+      <workItem from="1732651059708" duration="836000" />
+      <workItem from="1732651914162" duration="259000" />
+      <workItem from="1732652183203" duration="63000" />
     </task>
     <servers />
   </component>

@@ -20,7 +20,7 @@ A Java implementation of separable and steerable Gaussian filters for detecting 
 
 1. Compile the Java files:
 ```bash
-javac Image.java ImagePPM.java Relaxation.java Feature.java SeparableSteerable.java
+javac Image.java ImagePPM.java Helper.java Feature.java SeparableSteerable.java
 ```
 
 2. Run the program:
